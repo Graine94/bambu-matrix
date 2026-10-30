@@ -13,8 +13,9 @@ permissions:
   pages: write
   id-token: write
 
+# Своя очередь на каждую ветку и тег: сборка с тега не отменяет сборку main
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -42,7 +43,9 @@ jobs:
       - name: Build firmware and installer page
         run: bash scripts/build_web_install.sh
 
+      # Сайт публикуется только с main — GitHub не даёт деплоить Pages с тегов
       - uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/main'
         with:
           path: dist/web
 
@@ -59,6 +62,7 @@ jobs:
 
   deploy:
     needs: build
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
