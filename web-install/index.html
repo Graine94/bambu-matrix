@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bambu Matrix — install</title>
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+<style>
+:root{--bg:#f4f3ef;--card:#fff;--text:#1f1e1c;--muted:#6b6a65;--line:#e2e0d8;--accent:#1d9e75}
+@media(prefers-color-scheme:dark){:root{--bg:#161614;--card:#21201e;--text:#ecebe6;--muted:#9c9b95;--line:#34332f}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 -apple-system,system-ui,sans-serif}
+main{max-width:720px;margin:0 auto;padding:24px 16px 48px}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+h1{font-size:26px;margin:0 0 4px}
+h2{font-size:18px;margin:0 0 10px}
+.sub{color:var(--muted);margin:0 0 24px}
+.lang{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-shrink:0;margin-top:6px}
+.lang button{font:inherit;font-size:13px;border:0;background:transparent;color:var(--muted);padding:5px 12px;cursor:pointer}
+.lang button.on{background:var(--accent);color:#fff}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:16px}
+ol{margin:0;padding-left:22px}
+li{margin:6px 0}
+table{border-collapse:collapse;width:100%}
+td,th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}
+code{background:var(--bg);padding:1px 6px;border-radius:5px}
+.install button{font:inherit;font-size:17px;color:#fff;background:var(--accent);border:0;border-radius:10px;padding:12px 26px;cursor:pointer}
+.warn{color:#d0453f}
+.muted{color:var(--muted);font-size:14px}
+.foot{text-align:center}
+.foot a{color:var(--accent)}
+</style>
+</head>
+<body><main>
+<header>
+<div><h1>Bambu Matrix</h1>
+<p class="sub"><span data-i18n="tagline">Bambu Lab print status on a MAX7219 64×8 LED matrix</span> · <span data-i18n="version">version</span> __VERSION__</p></div>
+<div class="lang"><button data-lang="en">EN</button><button data-lang="ru">RU</button></div>
+</header>
+
+<section>
+<h2 data-i18n="s1">1. Install the firmware</h2>
+<ol>
+<li data-i18n="s1a">Open this page in <b>Chrome or Edge on a computer</b> (Safari and Firefox can't talk to USB devices).</li>
+<li data-i18n="s1b">Connect the ESP32 board to the computer with a USB data cable.</li>
+<li data-i18n="s1c">Press the button below and pick the board's port (usually <code>CP210x</code>, <code>CH340</code> or <code>usbserial</code>).</li>
+</ol>
+<p class="install">
+<esp-web-install-button manifest="manifest.json">
+<button slot="activate" data-i18n="installBtn">Install on ESP32</button>
+<span slot="unsupported" class="warn" data-i18n="unsupported">This browser can't install over USB — open the page in Chrome or Edge on a computer.</span>
+<span slot="not-allowed" class="warn" data-i18n="notAllowed">Installing only works over https — open the page at its regular address.</span>
+</esp-web-install-button>
+</p>
+<p class="muted" data-i18n="s1hint">If the port doesn't show up, install the USB-UART driver for your board (CH340 or CP210x). If flashing doesn't start, hold the BOOT button on the board while plugging it in.</p>
+</section>
+
+<section>
+<h2 data-i18n="s2">2. Connect to Wi-Fi</h2>
+<ol>
+<li data-i18n="s2a">After flashing, the matrix scrolls <code>SETUP WIFI: BambuMatrix PASS: bambu123</code>.</li>
+<li data-i18n="s2b">On your phone, join the <b>BambuMatrix</b> network, password <b>bambu123</b>. The setup page opens by itself (or go to <code>192.168.4.1</code>).</li>
+<li data-i18n="s2c">“Configure WiFi” → pick your network (2.4 GHz) → password → Save. The printer fields can stay empty.</li>
+<li data-i18n="s2d">The matrix connects and scrolls its address, for example <code>IP 192.168.1.53</code>.</li>
+</ol>
+</section>
+
+<section>
+<h2 data-i18n="s3">3. Pick your printer</h2>
+<ol>
+<li data-i18n="s3a">Open the address the matrix showed (or <code>http://bambu-matrix.local</code>) on your phone or computer.</li>
+<li data-i18n="s3b">Tap your printer in the “Found on the network” list.</li>
+<li data-i18n="s3c">Enter the <b>Access Code</b> — it's on the printer screen in the network (WLAN) settings.</li>
+<li data-i18n="s3d">Done: the status changes to “Connected”, and the matrix shows progress while printing.</li>
+</ol>
+<p class="muted" data-i18n="s3hint">The printer and the matrix must be on the same network. If the printer isn't found, enter its IP manually — it's in the same network settings on the printer.</p>
+</section>
+
+<section>
+<h2 data-i18n="wiring">Wiring the matrix</h2>
+<table>
+<tr><th data-i18n="colMatrix">MAX7219 matrix</th><th>ESP32</th></tr>
+<tr><td>VCC</td><td data-i18n="vcc">5 V (VIN / 5V; if the board has no 5 V pin, use a separate 5 V USB supply)</td></tr>
+<tr><td>GND</td><td data-i18n="gnd">GND (a common ground is required)</td></tr>
+<tr><td>DIN</td><td>GPIO23</td></tr>
+<tr><td>CLK</td><td>GPIO18</td></tr>
+<tr><td>CS</td><td>GPIO5</td></tr>
+</table>
+<p class="muted" data-i18n="wiringHint">8 modules of 8×8 in a row (FC-16). If the picture is mirrored or garbled, open “System” → “Picture looks wrong?” in the matrix settings.</p>
+</section>
+
+<section>
+<h2 data-i18n="msgs">Messages on the matrix</h2>
+<table>
+<tr><td><code>SETUP …</code></td><td data-i18n="m1">no Wi-Fi — join the BambuMatrix network</td></tr>
+<tr><td><code>SETUP: http://…</code></td><td data-i18n="m2">Wi-Fi is fine, no printer selected yet — open this address</td></tr>
+<tr><td><code>ACCESS CODE?</code></td><td data-i18n="m3">the printer rejected the Access Code — check the code</td></tr>
+<tr><td><code>PRINTER … NOT FOUND</code></td><td data-i18n="m4">nothing answers at this IP — check the IP and that the printer is on</td></tr>
+<tr><td><code>OTA</code></td><td data-i18n="m5">a firmware update over Wi-Fi is in progress</td></tr>
+</table>
+</section>
+<p class="muted foot"><a href="https://github.com/Graine94/bambu-matrix" data-i18n="source">Source code and instructions on GitHub</a></p>
+</main>
+<script>
+const RU={tagline:'Статус печати принтера Bambu Lab на светодиодной матрице MAX7219 64×8',version:'версия',
+s1:'1. Установить прошивку',s1a:'Открой эту страницу в <b>Chrome или Edge на компьютере</b> (Safari и Firefox не умеют работать с USB).',s1b:'Подключи плату ESP32 к компьютеру USB-кабелем с передачей данных.',
+s1c:'Нажми кнопку ниже и выбери порт платы (обычно <code>CP210x</code>, <code>CH340</code> или <code>usbserial</code>).',installBtn:'Установить на ESP32',
+unsupported:'Этот браузер не поддерживает установку по USB — открой страницу в Chrome или Edge на компьютере.',notAllowed:'Установка работает только по https — открой страницу по её обычному адресу.',
+s1hint:'Если порт не появляется — поставь драйвер USB-UART для своей платы (CH340 или CP210x). Если прошивка не начинается — зажми на плате кнопку BOOT в момент подключения.',
+s2:'2. Подключить к Wi-Fi',s2a:'После прошивки на матрице бежит <code>SETUP WIFI: BambuMatrix PASS: bambu123</code>.',
+s2b:'С телефона подключись к сети <b>BambuMatrix</b>, пароль <b>bambu123</b>. Страница настройки откроется сама (или зайди на <code>192.168.4.1</code>).',
+s2c:'«Configure WiFi» → выбери свою сеть (2,4 ГГц) → пароль → Save. Поля принтера можно оставить пустыми.',s2d:'Матрица подключится и прокрутит свой адрес, например <code>IP 192.168.1.53</code>.',
+s3:'3. Выбрать принтер',s3a:'Открой на телефоне или компьютере адрес, который показала матрица (или <code>http://bambu-matrix.local</code>).',s3b:'В списке «Найдены в сети» нажми на свой принтер.',
+s3c:'Введи <b>Access Code</b> — он на экране принтера в настройках сети (WLAN).',s3d:'Готово: статус станет «Подключено», а во время печати на матрице появится прогресс.',
+s3hint:'Принтер и матрица должны быть в одной сети. Если принтер не нашёлся — введи его IP вручную, он там же, в настройках сети принтера.',
+wiring:'Подключение матрицы',colMatrix:'Матрица MAX7219',vcc:'5 В (VIN / 5V; если на плате нет 5 В — отдельный USB-блок 5 В)',gnd:'GND (общая земля обязательна)',
+wiringHint:'8 модулей 8×8 подряд (FC-16). Если картинка зеркальная или «в кашу» — в настройках матрицы открой «Система» → «Изображение выглядит неправильно?».',
+msgs:'Сообщения на матрице',m1:'нет Wi-Fi — подключись к сети BambuMatrix',m2:'Wi-Fi есть, принтер ещё не выбран — открой этот адрес',m3:'принтер не принял Access Code — проверь код',
+m4:'по этому IP принтер не отвечает — проверь IP и что принтер включён',m5:'идёт обновление прошивки по Wi-Fi',source:'Исходный код и инструкции на GitHub'};
+function applyLang(l){const ru=l=='ru';document.documentElement.lang=ru?'ru':'en';
+document.querySelectorAll('[data-i18n]').forEach(el=>{if(el.dataset.en===undefined)el.dataset.en=el.innerHTML;el.innerHTML=ru?RU[el.dataset.i18n]:el.dataset.en});
+document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('on',b.dataset.lang==(ru?'ru':'en')))}
+/* выбор языка запоминает браузер: на этой странице платы ещё нет */
+let saved='en';try{saved=localStorage.getItem('lang')||'en'}catch(e){}
+document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>{try{localStorage.setItem('lang',b.dataset.lang)}catch(e){}applyLang(b.dataset.lang)});
+applyLang(saved);
+</script>
+</body>
+</html>

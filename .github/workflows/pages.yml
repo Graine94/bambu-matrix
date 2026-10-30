@@ -1,0 +1,68 @@
+# Собирает прошивку и публикует страницу установки из браузера на GitHub Pages.
+# Включить один раз: Settings → Pages → Source: GitHub Actions.
+name: Build and publish installer
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # для git describe
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio
+            .pio/libdeps
+          key: pio-${{ hashFiles('platformio.ini') }}
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Build firmware and installer page
+        run: bash scripts/build_web_install.sh
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/web
+
+      # На тег vX.Y.Z — ещё и релиз с файлами прошивки
+      - name: GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          # Описание релиза из коммитов — его же показывает веб-морда рядом с кнопкой «Обновить»
+          generate_release_notes: true
+          files: |
+            dist/web/bambu-matrix.bin
+            dist/web/bambu-matrix-ota.bin
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
